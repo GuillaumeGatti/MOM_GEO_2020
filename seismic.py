@@ -111,11 +111,11 @@ if __name__ == '__main__':
     plt.close('all')
 
     
-    data = pd.read_csv('data/CDSA_SeulementEssaimSaintes_2004-2005.txt', sep='\t')
+    data = pd.read_csv('data/ReNaSS_1980-2011_full.txt', sep='\t')
     
-    delta_d=5000
+    delta_d=1000
     delta_t=43200#259200
-    min_clust=3
+    min_clust=10
     
     data=seismic_clust(data,delta_d, delta_t,min_clust)
     

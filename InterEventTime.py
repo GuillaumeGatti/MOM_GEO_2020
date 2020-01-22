@@ -80,6 +80,7 @@ def GraphInterEventTime2(main,back):
     ax.set_ylabel('Probability')
     ax.legend()
     plt.show()
+    plt.savefig('poisson.png')
     return
     
 
