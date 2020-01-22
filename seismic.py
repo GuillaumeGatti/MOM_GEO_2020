@@ -54,7 +54,7 @@ def clust_temp(sec,delta_t):
     clust_t=n+1
     return lab_t,clust_t
 
-def seismic_clust(data, delta_d, delta_t,min_clust,max_clust) :
+def seismic_clust(data, delta_d, delta_t,min_clust) :
   start_time = process_time()
     
   [lab_d,clust_d]=clust_geo(data.p0, data.p1, delta_d)
@@ -72,8 +72,8 @@ def seismic_clust(data, delta_d, delta_t,min_clust,max_clust) :
 
   clust_tot=len(data['label'].unique())
   
-  print("clusters spatiaux :",clust_d)
-  print("clusters temporels :",clust_t)
+  print("spatial clusters :",clust_d)
+  print("temporal clusters  :",clust_t)
   print("clusters : "+str(clust_tot)+" ("+str(round(100*(1-(clust_tot/(clust_d*clust_t))),2))+"% de fusion)")
 
   lab=data.groupby(['label']).size().to_dict()
@@ -84,41 +84,54 @@ def seismic_clust(data, delta_d, delta_t,min_clust,max_clust) :
   data['card']=data['label'].apply(card_lab)
   
   back=data.loc[data['card'] <= min_clust] 
-  main=data.loc[(data['card'] > min_clust) & (data['card'] < max_clust)] 
+  main=data.loc[(data['card'] > min_clust)] 
+  
+  data['type']="foreground"
+  
+  index= main.groupby(['label'], sort=False)['mag'].idxmax()
+  data.at[index,'type']="mainshock"
+  data.at[back.index,'type']="background"
+  
   
   print("sequence : "+str(len(main))+" points en "+str(len(main["label"].unique()))+" clusters")
   print("background : "+str(len(back))+" points en "+str(len(back["label"].unique()))+" clusters")
-  print ("duration : "+str(round(process_time() - start_time,2))+ " seconds")
+  print("duration : "+str(round(process_time() - start_time,2))+ " seconds")
   
-  return data,back,main
+  return data
 
 def get_seq(data,label,path):
     data=data[data["label"]==label]
     data.to_csv(r''+path+'label_'+str(label)+'.txt', header=True, sep='\t')
-    print("Saved to"+path+'label_'+str(label)+'.txt')
+    print("Saved to "+path+'label_'+str(label)+'.txt')
     return data
 
 if __name__ == '__main__':
+    plt.close()
+    plt.close()
+    plt.close()
     
-    data = pd.read_csv('ReNaSS_1980-2011_full.txt', sep='\t')
-    delta_d=2000
+    data = pd.read_csv('CDSA_SeulementEssaimSaintes_2004-2005.txt', sep='\t')
+    
+    delta_d=1000
     delta_t=43200#259200
-    min_clust,max_clust=10,30000
+    min_clust=5
     
-    data,back,main=seismic_clust(data,delta_d, delta_t,min_clust,max_clust)
+    data=seismic_clust(data,delta_d, delta_t,min_clust)
     
-    maxi_main= main.groupby(['label'], sort=False)['mag'].idxmax()
-    main_filtred=main.loc[maxi_main]
-    
+    back=data[data["type"]=="background"]
+    fore=data[data["type"]=="foreground"]
+    main=data[data["type"]=="mainshock"]
+    plt.title("background")
     scatter(back.p0,back.p1,back.label)
     plt.figure()
+    plt.title("foreground")
     scatter(main.p0,main.p1,main.label)
     plt.figure()
     plt.scatter(back.sec,back.mag)
-    plt.scatter(main_filtred.sec,main_filtred.mag)
+    plt.scatter(main.sec,main.mag)
     plt.show()
 
-    path="/home/guillaume/Bureau/"
-    seq=get_seq(main,220,path)
+    path="./seq/"
+    seq=get_seq(data,170,path)
 
 
