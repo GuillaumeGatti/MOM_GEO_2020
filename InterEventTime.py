@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 
 def GraphInterEventTime(time):
-
+    time=np.array(time)
     time.sort()
     Norm_IET = np.diff(time) * np.size(time) / (time.max() - time.min())
 
@@ -47,11 +47,45 @@ def GraphInterEventTime(time):
         return Ms_pourcent
     elif (1 / beta) * 100 <= 100:
         return 1 / beta
-
+    
+def GraphInterEventTime2(main,back):
+    
+    def trace(time):
+        time=np.array(time)
+        time.sort()
+        Norm_IET = np.diff(time) * np.size(time) / (time.max() - time.min())
+    
+        beta = Norm_IET.var() / Norm_IET.mean()
+    
+        Tmp = Norm_IET[Norm_IET> 0]
+        sample_Norm_IE = np.linspace(Tmp.min(), Tmp.max(), 100)
+    
+        gamma = Norm_IET.mean() / beta
+        C = 1 / (math.gamma(gamma) * beta ** gamma)
+        proba = C * sample_Norm_IE ** (gamma - 1) * np.exp(-sample_Norm_IE / beta)
+    
+        x_log = np.logspace(np.log10(Tmp.min()), np.log10(Tmp.max()), 100)
+        
+        return x_log,sample_Norm_IE,proba
+    
+    fig, ax = plt.subplots()
+    x_log1,sample_Norm_IE1, proba1 = trace(main)
+    x_log2,sample_Norm_IE2, proba2 = trace(back)
+    ax.plot(sample_Norm_IE1, proba1, label='Mainshocks')
+    ax.plot(sample_Norm_IE2, proba2, label='Background')
+    ax.plot(x_log2, np.exp(-1 * x_log1) / 2, label='Poisson')
+    ax.set_xscale('log')
+    ax.set_xlabel('Normalized IET')
+    ax.set_yscale('log')
+    ax.set_ylabel('Probability')
+    ax.legend()
+    plt.show()
+    return
+    
 
 if __name__ == '__main__':
 
-    df = pd.read_csv('ReNaSS_1980-2011_full.txt', sep="\s+")
+    df = pd.read_csv('data/ReNaSS_1980-2011_full.txt', sep="\s+")
     time = np.array(df['sec'])
     Ms_pourcent = GraphInterEventTime(time)
     print(Ms_pourcent)

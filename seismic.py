@@ -21,6 +21,8 @@ import matplotlib.colors
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import LabelEncoder
 
+from InterEventTime import GraphInterEventTime,GraphInterEventTime2
+
 def scatter(x,y, cs, colorsMap='jet'):
     #si=[n**3 for n in cs]
     cm = plt.get_cmap(colorsMap)
@@ -86,7 +88,7 @@ def seismic_clust(data, delta_d, delta_t,min_clust) :
   back=data.loc[data['card'] <= min_clust] 
   main=data.loc[(data['card'] > min_clust)] 
   
-  data['type']="foreground"
+  data['type']="correlated sismicity"
   
   index= main.groupby(['label'], sort=False)['mag'].idxmax()
   data.at[index,'type']="mainshock"
@@ -106,25 +108,29 @@ def get_seq(data,label,path):
     return data
 
 if __name__ == '__main__':
-    plt.close()
-    plt.close()
-    plt.close()
+    plt.close('all')
+
     
-    data = pd.read_csv('CDSA_SeulementEssaimSaintes_2004-2005.txt', sep='\t')
+    data = pd.read_csv('data/CDSA_SeulementEssaimSaintes_2004-2005.txt', sep='\t')
     
-    delta_d=1000
+    delta_d=5000
     delta_t=43200#259200
-    min_clust=5
+    min_clust=3
     
     data=seismic_clust(data,delta_d, delta_t,min_clust)
     
+
     back=data[data["type"]=="background"]
-    fore=data[data["type"]=="foreground"]
+    #cor=data[data["type"]=="correlated sismicity"]
     main=data[data["type"]=="mainshock"]
-    plt.title("background")
+    
+    GraphInterEventTime2(main.sec,back.sec)
+    
+    plt.figure()
+    plt.title("background ("+str(len(back))+")")
     scatter(back.p0,back.p1,back.label)
     plt.figure()
-    plt.title("foreground")
+    plt.title("mainshocks ("+str(len(main))+")")
     scatter(main.p0,main.p1,main.label)
     plt.figure()
     plt.scatter(back.sec,back.mag)
