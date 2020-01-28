@@ -1,72 +1,181 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import sys
-import time
+import back
+from dash.dependencies import Input, Output, State
+import pandas as pd
+import dash_bootstrap_components as dbc
+import seismic
 
 
-def f():
-    return 5
+app = dash.Dash(__name__, suppress_callback_exceptions=True,)
+colors = {"background": "#FFFFFF", "text": "#7FDBFF"}
+
+path = "./seq/"
+
+click = 0
+
+graphs = html.Div(
+    children=[
+        html.Div(
+            id="selectLabel",
+            style={
+                "float": "right",
+                "width": "50%",
+                "height": "30px",
+                "margin": "10px",
+            },
+        ),
+        html.Div(
+            id="slider",
+            style={
+                "float": "right",
+                "width": "50%",
+                "height": "30px",
+                "margin": "10px",
+            },
+        ),
+        html.Div(
+            children=[
+                dcc.Graph(id="2d", style={"float": "right", "width": "50%",}),
+                dcc.Graph(id="time", style={"float": "left", "width": "50%"}),
+            ],
+        ),
+    ],
+)
+
+upload = dcc.Upload(
+    id="upload",
+    children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
+    style={
+        "float": "left",
+        "width": "30%",
+        "height": "60px",
+        "lineHeight": "60px",
+        "borderWidth": "1px",
+        "borderStyle": "dashed",
+        "borderRadius": "5px",
+        "textAlign": "center",
+    },
+    # Allow multiple files to be uploaded
+    multiple=True,
+)
+
+deroul = dcc.Dropdown(id=" selectLabel", multi=True,)
+
+firstDiv = html.Div(
+    style={"backgroundColor": colors["background"]},
+    children=[
+        html.H1(children="ok", style={"textAlign": "center", "color": colors["text"]},),
+        upload,
+        graphs,
+        html.Div(id="extract",),
+    ],
+)
 
 
-app = dash.Dash(__name__)
+secondDiv = html.Div(
+    style={"backgroundColor": colors["background"]},
+    children=[
+        html.H1(
+            children="tet", style={"textAlign": "center", "color": colors["text"]},
+        ),
+    ],
+)
 
-secondDiv = html.Div(children=[
-                                html.Div(children=[html.Div(children=[
-                                    html.H6(children='clustering parameters')]),
-                                    html.Div(id="abc", children=[html.H5(children='Δt'),
 
-                                                                 dcc.Slider(
-                                                                     id='my-slider',
-                                                                     min=f(),
-                                                                     max=100,
-                                                                     step=0.5,
-                                                                     value=30,
+secondDiv = html.Div(
+    children=[
+        html.Div(
+            children=[
+                html.Div(children=[html.H6(children="clustering parameters")]),
+                html.Div(
+                    id="abc",
+                    children=[
+                        html.H5(children="Δt"),
+                        dcc.Slider(
+                            id="my-slider", min=0, max=259000, step=0.5, value=259000,
+                        ),
+                        dcc.Input(
+                            id="deltaTmax",
+                            placeholder="Δt max",
+                            value="259000",
+                            type="text",
+                        ),
+                        html.Div(id="slider-output-t"),
+                    ],
+                ),
+                html.Div(
+                    children=[
+                        html.H5(children="Δd"),
+                        dcc.Slider(
+                            id="my-slider2", min=0, max=5000, step=0.5, value=5000
+                        ),
+                        dcc.Input(id="deltaDmax", placeholder="Δd max", type="text"),
+                        html.Div(id="slider-output-d"),
+                    ]
+                ),
+            ],
+            style={
+                "width": "30%",
+                "float": "right",
+                "border": "2px black solid",
+                "border-radius": "25px",
+            },
+        ),
+        html.Div(
+            children=[
+                html.Div(
+                    [
+                        html.H3("Column 2"),
+                        dcc.Graph(id="g2", figure={"data": [{"y": [1, 2, 3]}]}),
+                    ],
+                    style={"width": "35%", "float": "left"},
+                ),
+                html.Div(
+                    [
+                        html.H3("Column 3"),
+                        dcc.Graph(id="g3", figure={"data": [{"y": [1, 2, 3]}]}),
+                    ],
+                    style={"width": "35%", "float": "right"},
+                ),
+            ],
+            style={
+                "width": "80%",
+                "margin-top": "60px",
+                "float": "left",
+                "border": "2px black solid",
+            },
+        ),
+    ]
+)
 
-                                                                 ), dcc.Input(id='deltaTmax', placeholder='Δt max',
-                                                                              value='60', type='text'),
-                                                                 html.Div(id='slider-output-t')]),
-                                    html.Div(children=[html.H5(children='Δd'),
-                                                       dcc.Slider(
-                                                           id='my-slider2',
-                                                           min=0,
-                                                           max=100,
-                                                           step=0.5,
-                                                           value=10
-                                                       ), dcc.Input(id='deltaDmax', placeholder='Δd max', type='text'),
-                                                       html.Div(id='slider-output-d')])
-                                ], style={'width': '30%', 'float': 'right', "border": "2px black solid",
-                                          'border-radius': '25px'}),html.Div(children=[ html.Div([
-        html.H3('Column 2'),
-        dcc.Graph(id='g2', figure={'data': [{'y': [1, 2, 3]}]})
-    ], style={'width': '35%', 'float': 'left'}),
+app.layout = html.Div([firstDiv, secondDiv])
 
-    html.Div([
-        html.H3('Column 3'),
-        dcc.Graph(id='g3', figure={'data': [{'y': [1, 2, 3]}]})
-    ], style={'width': '35%', 'float': 'right'})], style={'width': '80%',"margin-top":"60px", 'float': 'left', "border": "2px black solid"})])
 
-app.layout=secondDiv
 @app.callback(
-    dash.dependencies.Output('slider-output-t', 'children'),
-    [dash.dependencies.Input('my-slider', 'value')])
+    dash.dependencies.Output("slider-output-t", "children"),
+    [dash.dependencies.Input("my-slider", "value")],
+)
 def t2(value):
-    return 'Δt=' + str(value) + ' s'
+    return "Δt=" + str(value) + " s"
 
 
 @app.callback(
-    dash.dependencies.Output('slider-output-d', 'children'),
-    [dash.dependencies.Input('my-slider2', 'value')])
+    dash.dependencies.Output("slider-output-d", "children"),
+    [dash.dependencies.Input("my-slider2", "value")],
+)
 def k2(value):
-    return 'Δd=' + str(value) + ' s'
+    return "Δd=" + str(value) + " s"
 
 
 @app.callback(
-    dash.dependencies.Output('my-slider', 'max'),
-    [dash.dependencies.Input('deltaTmax', 'value')])
+    dash.dependencies.Output("my-slider", "max"),
+    [dash.dependencies.Input("deltaTmax", "value")],
+)
 def k2(value):
-    if value == '':
-        while value == '':
+    if value == "":
+        while value == "":
             1 == 1
     if value.endswith("j"):
         value = value[:-1]
@@ -89,5 +198,65 @@ def k2(value):
     return int(value)
 
 
-if __name__ == '__main__':
+@app.callback(
+    [
+        Output("slider", "children"),
+        Output("selectLabel", "children"),
+        Output("extract", "children"),
+    ],
+    [Input("upload", "contents")],
+    [State("upload", "filename")],
+)
+def load(list_of_contents, list_of_names):
+    if list_of_contents is not None:
+        children = [
+            back.parse_contents(c, n) for c, n in zip(list_of_contents, list_of_names)
+        ]
+
+        return children[0]
+
+
+@app.callback(
+    [Output("time", "figure"), Output("2d", "figure")],
+    [Input("slid", "value"), Input("drop", "value")],
+)
+def update_graph(values1, values):
+
+    return back.grphcreate(values1[0], values1[1], values)
+
+
+@app.callback(
+    [Output("drop", "options"), Output("drop", "value")],
+    [Input("my-slider2", "value"), Input("my-slider", "value")],
+)
+def clustering(deltD, deltT):
+
+    back.clustering(deltD, deltT, 10)
+
+    a = [
+        {"label": i, "value": i}
+        for i in back.df1[
+            back.df1["type"].isin(["mainshock", "correlated sismicity"])
+        ].label.unique()
+    ]
+    b = back.df1[
+        back.df1["type"].isin(["mainshock", "correlated sismicity"])
+    ].label.unique()
+    return a, b
+
+
+@app.callback(
+    Output("export", "style"), [Input("export", "n_clicks"), Input("drop", "value")]
+)
+def download(n_clicks, clusters):
+    global click
+    print(click)
+    if n_clicks > click:
+        back.export(clusters)
+        click += 1
+
+    return {}
+
+
+if __name__ == "__main__":
     app.run_server(debug=True)
