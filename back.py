@@ -66,25 +66,30 @@ def grphcreate(valmin, valmax, values):
                         (df1["sec"] > valmin)
                         & (df1["sec"] < valmax)
                         & (df1["label"].isin(values))
-                        & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                        & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                     ]["p0"],
                     y=df1[
                         (df1["sec"] > valmin)
                         & (df1["sec"] < valmax)
                         & (df1["label"].isin(values))
-                        & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                        & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                     ]["p1"],
                     mode="markers",
                     hovertext=df1[
                         (df1["sec"] > valmin)
                         & (df1["sec"] < valmax)
                         & (df1["label"].isin(values))
-                        & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                        & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                     ]["label"],
                     hoverinfo="text",
                     opacity=0.7,
                     marker={
-                        "color": df1["label"],
+                        "color": df1[
+                            (df1["sec"] > valmin)
+                            & (df1["sec"] < valmax)
+                            & (df1["label"].isin(values))
+                            & (df1["type"].isin(["mainshock", "correlated sismicity"]))
+                        ]["label"],
                         "size": 8,
                         "line": {"width": 0.5, "color": "white"},
                     },
@@ -105,20 +110,20 @@ def grphcreate(valmin, valmax, values):
                         (df1["sec"] > valmin)
                         & (df1["sec"] < valmax)
                         & (df1["label"].isin(values))
-                        & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                        & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                     ]["sec"],
                     y=df1[
                         (df1["sec"] > valmin)
                         & (df1["sec"] < valmax)
                         & (df1["label"].isin(values))
-                        & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                        & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                     ]["mag"],
                     mode="markers",
                     hovertext=df1[
                         (df1["sec"] > valmin)
                         & (df1["sec"] < valmax)
                         & (df1["label"].isin(values))
-                        & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                        & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                     ]["label"],
                     hoverinfo="text",
                     opacity=0.7,
@@ -127,7 +132,7 @@ def grphcreate(valmin, valmax, values):
                             (df1["sec"] > valmin)
                             & (df1["sec"] < valmax)
                             & (df1["label"].isin(values))
-                            & (df1["type"].isin(["mainchock", "correlated sismicity"]))
+                            & (df1["type"].isin(["mainshock", "correlated sismicity"]))
                         ]["label"],
                         "size": 8,
                         "line": {"width": 0.5, "color": "white"},
@@ -151,15 +156,45 @@ def clustering(delta_d, delta_t, min_clust):
     global df1
     df1 = sei.seismic_clust(df1, delta_d, delta_t, min_clust)
     print("ok")
-    back = df1[df1["type"] == "background"]
+    back1 = df1[df1["type"] == "background"]
     cor = df1[df1["type"] == "correlated sismicity"]
-    main = df1[df1["type"] == "mainshock"]
+    main1 = df1[df1["type"] == "mainshock"]
+    # sei.GraphInterEventTime2(main1.sec, back1.sec)
 
 
-path = "./seq/"
+# sei.GraphInterEventTime2(main.sec, back.sec)
 
 
-def export(clusters):
-    sei.get_seq(df1, clusters, path)
-
-    # sei.GraphInterEventTime2(main.sec, back.sec)
+def graphMain():
+    return [
+        {
+            "data": [
+                {
+                    "x": df1[(df1["type"].isin(["mainshock"]))]["sec"],
+                    "y": df1[(df1["type"].isin(["mainshock"]))]["mag"],
+                    "mode": "markers",
+                    "hovertext": df1[(df1["type"].isin(["mainshock"]))]["label"],
+                    "hoverinfo": "text",
+                    "opacity": 0.7,
+                    "name": "mainshock",
+                    "mode": "markers",
+                },
+                {
+                    "x": df1[(df1["type"].isin(["background"]))]["sec"],
+                    "y": df1[(df1["type"].isin(["background"]))]["mag"],
+                    "mode": "markers",
+                    "hovertext": "background",
+                    "hoverinfo": "text",
+                    "opacity": 0.7,
+                    "name": "background",
+                },
+            ],
+            "layout": dict(
+                xaxis={"title": "X"},
+                yaxis={"title": "Y"},
+                legend={"x": 0, "y": 1},
+                hovermode="closest",
+                margin={"l": 25, "r": 25},
+            ),
+        },
+    ]

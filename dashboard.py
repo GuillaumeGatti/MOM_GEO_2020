@@ -6,12 +6,16 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 import dash_bootstrap_components as dbc
 import seismic
+import base64
 
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True,)
 colors = {"background": "#FFFFFF", "text": "#7FDBFF"}
 
 path = "./seq/"
+
+# image_filename = "my-image.png"  # replace with your own image
+# encoded_image = base64.b64encode(open(image_filename, "rb").read())
 
 click = 0
 
@@ -124,22 +128,7 @@ secondDiv = html.Div(
             },
         ),
         html.Div(
-            children=[
-                html.Div(
-                    [
-                        html.H3("Column 2"),
-                        dcc.Graph(id="g2", figure={"data": [{"y": [1, 2, 3]}]}),
-                    ],
-                    style={"width": "35%", "float": "left"},
-                ),
-                html.Div(
-                    [
-                        html.H3("Column 3"),
-                        dcc.Graph(id="g3", figure={"data": [{"y": [1, 2, 3]}]}),
-                    ],
-                    style={"width": "35%", "float": "right"},
-                ),
-            ],
+            children=[html.Div([html.H3("Column 3"), dcc.Graph(id="g3"),],),],
             style={
                 "width": "80%",
                 "margin-top": "60px",
@@ -226,12 +215,16 @@ def update_graph(values1, values):
 
 
 @app.callback(
-    [Output("drop", "options"), Output("drop", "value")],
+    [Output("drop", "options"), Output("drop", "value"), Output("g3", "figure"),],
     [Input("my-slider2", "value"), Input("my-slider", "value")],
 )
 def clustering(deltD, deltT):
 
     back.clustering(deltD, deltT, 10)
+
+    # image_filename = "poisson.png"  # replace with your own image
+    # encoded_image = base64.b64encode(open(image_filename, "rb").read())
+    # src = "data:image/png;base64,{}".format(encoded_image.decode())
 
     a = [
         {"label": i, "value": i}
@@ -242,7 +235,11 @@ def clustering(deltD, deltT):
     b = back.df1[
         back.df1["type"].isin(["mainshock", "correlated sismicity"])
     ].label.unique()
-    return a, b
+    print("ok")
+
+    c = back.graphMain()
+
+    return a, b, c[0]
 
 
 @app.callback(
