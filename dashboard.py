@@ -192,7 +192,11 @@ def k2(value):
 def t2(v):
    return int(v)/1000
 
-
+@app.callback(
+   dash.dependencies.Output('my-slider', 'min'),
+   [dash.dependencies.Input('my-slider', 'max')])
+def t2(v):
+   return int(v)/1000
 
 @app.callback(
    dash.dependencies.Output('my-slider2', 'max'),
