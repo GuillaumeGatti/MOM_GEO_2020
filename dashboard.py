@@ -99,7 +99,7 @@ secondDiv = html.Div(
                         html.H5(children="Δt"),
                         dcc.Slider(
                             id="my-slider", min=0, max=259000, step=0.5, value=259000,
-                        ),
+                        ),html.H6(children='Enter Δt max'),
                         dcc.Input(
                             id="deltaTmax",
                             placeholder="Δt max",
@@ -114,7 +114,7 @@ secondDiv = html.Div(
                         html.H5(children="Δd"),
                         dcc.Slider(
                             id="my-slider2", min=0, max=5000, step=0.5, value=5000
-                        ),
+                        ),html.H6(children='Enter Δd max'),
                         dcc.Input(id="deltaDmax", placeholder="Δd max", type="text"),
                         html.Div(id="slider-output-d"),
                     ]
