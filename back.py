@@ -24,27 +24,31 @@ def parse_contents(contents, filename):
     decoded = base64.b64decode(content_string)
     try:
         global df1
-        df1 = pd.read_csv(io.StringIO(decoded.decode("utf-8")), sep=" ")
+        df1 = pd.read_csv(io.StringIO(decoded.decode("utf-8")), sep="\t")
         df1["label"] = 1
 
     except Exception as e:
         print(e)
         return html.Div(["There was an error processing this file."])
 
+    print("chargé")
     result1 = dcc.RangeSlider(
         id="slid",
         min=df1["sec"].min(),
         max=df1["sec"].max(),
-        step=1000,
+        step=100000,
         value=[df1["sec"].min(), df1["sec"].max()],
     )
+    print("time")
 
     result2 = dcc.Dropdown(
         id="drop",
         options=[{"label": i, "value": i} for i in df1.label.unique()],
         multi=True,
     )
+    print("drop")
     result3 = html.Button("extract", id="export", style={"color": "#FF0000"})
+    print("ok11")
     return (result1, result2, result3)
 
     #     dcc.RangeSlider(

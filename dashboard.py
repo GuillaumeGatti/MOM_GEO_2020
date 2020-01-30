@@ -215,7 +215,7 @@ def update_graph(values1, values):
 
 
 @app.callback(
-    [Output("drop", "options"), Output("drop", "value"), Output("g3", "figure"),],
+    [Output("drop", "options"), Output("g3", "figure"),],
     [Input("my-slider2", "value"), Input("my-slider", "value")],
 )
 def clustering(deltD, deltT):
@@ -232,14 +232,12 @@ def clustering(deltD, deltT):
             back.df1["type"].isin(["mainshock", "correlated sismicity"])
         ].label.unique()
     ]
-    b = back.df1[
-        back.df1["type"].isin(["mainshock", "correlated sismicity"])
-    ].label.unique()
+
     print("ok")
 
     c = back.graphMain()
 
-    return a, b, c[0]
+    return a, c[0]
 
 
 @app.callback(
