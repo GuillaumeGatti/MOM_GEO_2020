@@ -167,6 +167,11 @@ def clustering(delta_d, delta_t, min_clust):
 
 
 # sei.GraphInterEventTime2(main.sec, back.sec)
+path = "./seq/"
+
+
+def export(clusters):
+    sei.get_seq(df1, clusters, path)
 
 
 def graphMain():
