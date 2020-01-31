@@ -131,7 +131,7 @@ secondDiv = html.Div(
                 ),
             ],
             style={
-                "width": "30%",
+                "width": "25%",
                 "float": "right",
                 "border": "2px black solid",
                 "border-radius": "25px",
@@ -140,7 +140,7 @@ secondDiv = html.Div(
         html.Div(
             children=[html.Div([html.H3("Column 3"), dcc.Graph(id="g3"),],),],
             style={
-                "width": "80%",
+                "width": "70%",
                 "margin-top": "60px",
                 "float": "left",
                 "border": "2px black solid",
