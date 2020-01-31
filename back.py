@@ -100,8 +100,8 @@ def grphcreate(valmin, valmax, values):
                 )
             ],
             "layout": dict(
-                xaxis={"title": "X"},
-                yaxis={"title": "Y"},
+                xaxis={"title": "latitude"},
+                yaxis={"title": "longitude"},
                 legend={"x": 0, "y": 1},
                 hovermode="closest",
                 margin={"l": 45, "r": 10},
@@ -144,8 +144,8 @@ def grphcreate(valmin, valmax, values):
                 )
             ],
             "layout": dict(
-                xaxis={"title": "X"},
-                yaxis={"title": "Y"},
+                xaxis={"title": "temps"},
+                yaxis={"title": "magnitude"},
                 legend={"x": 0, "y": 1},
                 hovermode="closest",
                 margin={"l": 25, "r": 25},
@@ -194,8 +194,8 @@ def graphMain():
                 },
             ],
             "layout": dict(
-                xaxis={"title": "X"},
-                yaxis={"title": "Y"},
+                xaxis={"title": "latitude"},
+                yaxis={"title": "longitude"},
                 legend={"x": 0, "y": 1},
                 hovermode="closest",
                 margin={"l": 25, "r": 25},

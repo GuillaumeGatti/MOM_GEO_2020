@@ -70,7 +70,10 @@ deroul = dcc.Dropdown(id=" selectLabel", multi=True,)
 firstDiv = html.Div(
     style={"backgroundColor": colors["background"]},
     children=[
-        html.H1(children="ok", style={"textAlign": "center", "color": colors["text"]},),
+        html.H1(
+            children="Declustering Seismes",
+            style={"textAlign": "center", "color": colors["text"]},
+        ),
         upload,
         graphs,
         html.Div(id="extract",),
@@ -99,7 +102,8 @@ secondDiv = html.Div(
                         html.H5(children="Δt"),
                         dcc.Slider(
                             id="my-slider", min=259, max=259000, step=0.5, value=259000,
-                        ),html.H6(children='Enter Δt max'),
+                        ),
+                        html.H6(children="Enter Δt max"),
                         dcc.Input(
                             id="deltaTmax",
                             placeholder="Δt max",
@@ -114,8 +118,14 @@ secondDiv = html.Div(
                         html.H5(children="Δd"),
                         dcc.Slider(
                             id="my-slider2", min=5, max=5000, step=0.5, value=5000
-                        ),html.H6(children='Enter Δd max'),
-                        dcc.Input(id="deltaDmax", placeholder="Δd max", value="5000",type="text"),
+                        ),
+                        html.H6(children="Enter Δd max"),
+                        dcc.Input(
+                            id="deltaDmax",
+                            placeholder="Δd max",
+                            value="5000",
+                            type="text",
+                        ),
                         html.Div(id="slider-output-d"),
                     ]
                 ),
@@ -186,45 +196,51 @@ def k2(value):
         return value
     return int(value)
 
-@app.callback(
-   dash.dependencies.Output('my-slider2', 'min'),
-   [dash.dependencies.Input('my-slider2', 'max')])
-def t2(v):
-   return int(v)/1000
 
 @app.callback(
-   dash.dependencies.Output('my-slider', 'min'),
-   [dash.dependencies.Input('my-slider', 'max')])
+    dash.dependencies.Output("my-slider2", "min"),
+    [dash.dependencies.Input("my-slider2", "max")],
+)
 def t2(v):
-   return int(v)/1000
+    return int(v) / 1000
+
 
 @app.callback(
-   dash.dependencies.Output('my-slider2', 'max'),
-   [dash.dependencies.Input('deltaDmax', 'value')])
+    dash.dependencies.Output("my-slider", "min"),
+    [dash.dependencies.Input("my-slider", "max")],
+)
+def t2(v):
+    return int(v) / 1000
+
+
+@app.callback(
+    dash.dependencies.Output("my-slider2", "max"),
+    [dash.dependencies.Input("deltaDmax", "value")],
+)
 def k2(value):
-   if value == '' :
-       while value == '' :
-           1 == 1
-   value=str(value).lower()
-   value.replace(" ", "")
-   if value.endswith("km") :
-       value = value[:-2]
-       value.replace(" ", "")
-       value = int(value)
-       value = 1000 * value
-       return value
-   if value.endswith("m"):
-       value = value[:-1]
-       value.replace(" ", "")
-       value = int(value)
-       return value
-   if  value.endswith('k'):
-       value = value[:-1]
-       value.replace(" ", "")
-       value = int(value)
-       value = 1000 * value
-       return value
-   return int(value)
+    if value == "":
+        while value == "":
+            1 == 1
+    value = str(value).lower()
+    value.replace(" ", "")
+    if value.endswith("km"):
+        value = value[:-2]
+        value.replace(" ", "")
+        value = int(value)
+        value = 1000 * value
+        return value
+    if value.endswith("m"):
+        value = value[:-1]
+        value.replace(" ", "")
+        value = int(value)
+        return value
+    if value.endswith("k"):
+        value = value[:-1]
+        value.replace(" ", "")
+        value = int(value)
+        value = 1000 * value
+        return value
+    return int(value)
 
 
 @app.callback(
@@ -294,4 +310,4 @@ def download(n_clicks, clusters):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
